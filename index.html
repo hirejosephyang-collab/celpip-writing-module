@@ -3,24 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CELPIP Writing Practice Module v5</title>
+<title>CELPIP Writing Practice Module v6</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family: Arial, 'Malgun Gothic', sans-serif; background:#e8e8e8; }
   .hidden { display:none !important; }
 
   /* ===== 공통 헤더 ===== */
-  .header { background:#4a4a4a; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+  .header { background:#4a4a4a; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
   .header h1 { font-size:18px; font-weight:normal; }
   .timer { font-size:16px; }
   .timer span { font-weight:bold; color:#ffcc00; }
   .timer.expired span { color:#ff5555; }
   .task-indicator { background:#333; color:#fff; padding:5px 15px; font-size:14px; }
 
-  /* ===== 홈 화면 ===== */
-  .home-wrap { max-width:1200px; margin:20px auto; padding:0 20px; }
-  .home-toolbar { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
-  .btn { padding:10px 20px; font-size:14px; cursor:pointer; border:none; border-radius:4px; }
+  /* ===== 버튼 ===== */
+  .btn { padding:10px 20px; font-size:14px; cursor:pointer; border:none; border-radius:4px; min-height:44px; }
   .btn:hover { opacity:.85; }
   .btn-home { background:#666; color:#fff; }
   .btn-next { background:#0066cc; color:#fff; }
@@ -32,6 +30,11 @@
   .btn-copy { background:#17a2b8; color:#fff; }
   .btn-export { background:#6f42c1; color:#fff; }
   .btn-import { background:#6f42c1; color:#fff; }
+
+  /* ===== 홈 화면 ===== */
+  .home-wrap { max-width:1200px; margin:20px auto; padding:0 20px; }
+  .home-toolbar { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; align-items:center; }
+  .home-toolbar span { font-size:12px; color:#666; }
 
   .set-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:12px; }
   .set-card { background:#fff; border:1px solid #ccc; border-radius:6px; padding:14px; }
@@ -47,36 +50,130 @@
   .editor-section h2 { font-size:16px; margin-bottom:12px; color:#0066cc; }
   .field { margin-bottom:12px; }
   .field label { display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#333; }
-  .field input[type=text], .field textarea { width:100%; padding:8px; font-size:14px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
-  .field textarea { min-height:90px; resize:vertical; line-height:1.5; }
-  .editor-actions { display:flex; gap:10px; }
+  .field input[type=text], .field textarea { width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
+  .field textarea { min-height:100px; resize:vertical; line-height:1.5; }
+  .editor-actions { display:flex; gap:10px; flex-wrap:wrap; }
 
-  /* ===== 시험 화면 ===== */
-  .container { display:flex; height:calc(100vh - 120px); }
+  /* ===== 시험 화면 (데스크톱) ===== */
+  .container { display:flex; height:calc(100vh - 140px); }
   .left-panel { width:40%; background:#f5f5f5; padding:20px; overflow-y:auto; border-right:1px solid #ccc; }
   .right-panel { width:60%; background:#e6f3f7; padding:20px; display:flex; flex-direction:column; }
-  .info-icon { display:inline-block; width:24px; height:24px; background:#0066cc; color:#fff; border-radius:50%; text-align:center; line-height:24px; margin-right:10px; font-weight:bold; }
-  .instruction { color:#0066cc; font-size:16px; margin-bottom:20px; font-weight:bold; }
-  .passage { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; line-height:1.6; white-space:pre-wrap; }
-  .bullet-list { margin-left:40px; line-height:2; }
+  .info-icon { display:inline-block; width:24px; height:24px; background:#0066cc; color:#fff; border-radius:50%; text-align:center; line-height:24px; margin-right:10px; font-weight:bold; flex-shrink:0; }
+  .instruction { color:#0066cc; font-size:16px; margin-bottom:20px; font-weight:bold; display:flex; align-items:flex-start; }
+  .passage { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; line-height:1.6; white-space:pre-wrap; font-size:15px; }
+  .bullet-list { margin-left:40px; line-height:2; font-size:15px; }
   .options { margin:10px 0 20px; }
-  .option { margin:10px 0; display:flex; align-items:flex-start; }
-  .option input[type=radio] { margin-right:10px; margin-top:3px; width:18px; height:18px; cursor:pointer; flex-shrink:0; }
+  .option { margin:12px 0; display:flex; align-items:flex-start; }
+  .option input[type=radio] { margin-right:12px; margin-top:2px; width:22px; height:22px; cursor:pointer; flex-shrink:0; }
   .option label { cursor:pointer; font-size:15px; line-height:1.5; }
-  .writing-area { flex:1; display:flex; flex-direction:column; }
-  textarea.essay { flex:1; padding:15px; font-size:15px; line-height:1.6; border:1px solid #ccc; resize:none; font-family:Arial,sans-serif; }
+  .writing-area { flex:1; display:flex; flex-direction:column; min-height:200px; }
+  textarea.essay { flex:1; padding:15px; font-size:16px; line-height:1.6; border:1px solid #ccc; resize:none; font-family:Arial,sans-serif; min-height:150px; }
   .word-count { padding:10px; background:#f0f0f0; text-align:right; font-size:14px; color:#666; }
   .word-count.target { color:#0a8a00; font-weight:bold; }
   .word-count.over { color:#cc0000; font-weight:bold; }
-  .nav-buttons { padding:15px 20px; background:#e8e8e8; display:flex; justify-content:space-between; }
+  .nav-buttons { padding:15px 20px; background:#e8e8e8; display:flex; justify-content:space-between; gap:10px; }
 
   /* ===== 결과 화면 ===== */
   .results-wrap { max-width:900px; margin:20px auto; padding:0 20px 40px; }
   .result-box { background:#f5f5f5; border:1px solid #ddd; padding:20px; margin:20px 0; }
   .result-box h3 { margin-bottom:10px; }
-  .result-box pre { white-space:pre-wrap; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; background:#fff; padding:12px; border:1px solid #eee; }
+  .result-box pre { white-space:pre-wrap; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; background:#fff; padding:12px; border:1px solid #eee; overflow-x:auto; }
   .meta { margin-top:10px; color:#666; font-size:13px; }
   .copied-msg { color:#28a745; font-weight:bold; margin-left:10px; }
+
+  /* ========================================
+     반응형 디자인
+     ======================================== */
+
+  /* 태블릿 (768px ~ 1024px) */
+  @media screen and (max-width: 1024px) {
+    .container { height:auto; min-height:calc(100vh - 140px); }
+    .left-panel, .right-panel { width:50%; }
+    .header h1 { font-size:16px; }
+    .instruction { font-size:15px; }
+    .passage { font-size:14px; }
+    textarea.essay { font-size:15px; }
+  }
+
+  /* 소형 태블릿 및 대형 휴대폰 (최대 768px) */
+  @media screen and (max-width: 768px) {
+    .header { padding:12px 15px; }
+    .header h1 { font-size:15px; width:100%; }
+    .timer { font-size:14px; }
+    .task-indicator { font-size:12px; }
+
+    /* 시험 화면: 세로 배치로 변경 */
+    .container { flex-direction:column; height:auto; }
+    .left-panel, .right-panel { width:100%; }
+    .left-panel { border-right:none; border-bottom:1px solid #ccc; max-height:50vh; overflow-y:auto; }
+    .right-panel { min-height:50vh; }
+
+    .info-icon { width:20px; height:20px; line-height:20px; font-size:12px; }
+    .instruction { font-size:14px; margin-bottom:15px; }
+    .passage { font-size:14px; padding:12px; }
+    .bullet-list { margin-left:20px; font-size:14px; line-height:1.8; }
+
+    .option input[type=radio] { width:24px; height:24px; }
+    .option label { font-size:14px; }
+
+    textarea.essay { font-size:16px; min-height:200px; }
+    .word-count { font-size:13px; }
+
+    .nav-buttons { padding:12px 15px; }
+    .btn { padding:12px 16px; font-size:14px; flex:1; }
+
+    /* 홈 화면 */
+    .home-wrap { padding:0 15px; }
+    .set-grid { grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; }
+    .set-card { padding:12px; }
+    .set-card h3 { font-size:14px; }
+    .set-card .row { flex-direction:column; }
+    .set-card .row .btn { width:100%; }
+
+    /* 에디터 */
+    .editor-wrap { padding:0 15px 30px; }
+    .editor-section { padding:15px; }
+    .editor-section h2 { font-size:15px; }
+    .editor-actions { flex-direction:column; }
+    .editor-actions .btn { width:100%; }
+
+    /* 결과 화면 */
+    .results-wrap { padding:0 15px 30px; }
+    .result-box { padding:15px; }
+    .result-box pre { font-size:13px; }
+    .copied-msg { display:block; margin:10px 0 0 0; }
+  }
+
+  /* 소형 휴대폰 (최대 480px) */
+  @media screen and (max-width: 480px) {
+    .header h1 { font-size:14px; }
+    .timer { font-size:13px; }
+    .timer span { font-size:14px; }
+
+    .set-grid { grid-template-columns:1fr 1fr; gap:8px; }
+    .set-card { padding:10px; }
+    .set-card h3 { font-size:13px; }
+    .set-status { font-size:11px; }
+
+    .instruction { font-size:13px; }
+    .passage { font-size:13px; }
+    .bullet-list { font-size:13px; margin-left:15px; }
+    .option label { font-size:13px; }
+
+    textarea.essay { min-height:180px; }
+
+    .btn { padding:14px 12px; font-size:13px; }
+  }
+
+  /* 가로 모드 휴대폰 (높이 제한) */
+  @media screen and (max-height: 500px) and (orientation: landscape) {
+    .container { flex-direction:row; height:calc(100vh - 100px); }
+    .left-panel { width:35%; max-height:none; border-right:1px solid #ccc; border-bottom:none; }
+    .right-panel { width:65%; }
+    .header { padding:8px 15px; }
+    .header h1 { font-size:13px; width:auto; }
+    .nav-buttons { padding:8px 15px; }
+  }
 </style>
 </head>
 <body>
@@ -89,10 +186,10 @@
   </div>
   <div class="home-wrap">
     <div class="home-toolbar">
-      <button class="btn btn-export" onclick="exportData()">⬇ 백업 (JSON 저장)</button>
-      <button class="btn btn-import" onclick="document.getElementById('importFile').click()">⬆ 복원 (JSON 불러오기)</button>
+      <button class="btn btn-export" onclick="exportData()">⬇ 백업</button>
+      <button class="btn btn-import" onclick="document.getElementById('importFile').click()">⬆ 복원</button>
       <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
-      <span style="font-size:12px;color:#666;align-self:center;">데이터는 이 브라우저(localStorage)에 자동 저장됩니다. 기기 변경 시 백업 파일을 사용하세요.</span>
+      <span>데이터는 브라우저에 자동 저장됩니다.</span>
     </div>
     <div class="set-grid" id="setGrid"></div>
   </div>
@@ -123,7 +220,7 @@
         <textarea id="ed-t1-bullets" placeholder="Explain how you feel about her high school grades.&#10;Explain why a college education is good.&#10;Explain why going to work instead of college is unwise."></textarea>
       </div>
       <div class="field">
-        <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
+        <label>모범답안 (CLB 10, 선택사항)</label>
         <textarea id="ed-t1-model" placeholder="Dear ..."></textarea>
       </div>
     </div>
@@ -132,22 +229,22 @@
       <h2>Task 2: Responding to Survey Questions (26분)</h2>
       <div class="field">
         <label>상황 설명 (Read the following information)</label>
-        <textarea id="ed-t2-situation" placeholder="Your community centre is surveying your opinion on a new event happening every Saturday in the park near your home. There are two events being considered. One suggestion is a vegetable and fruit market. The other suggestion is a second-hand furniture and appliance market."></textarea>
+        <textarea id="ed-t2-situation" placeholder="Your community centre is surveying your opinion on a new event happening every Saturday in the park near your home."></textarea>
       </div>
       <div class="field">
         <label>질문 (Question)</label>
-        <input type="text" id="ed-t2-question" placeholder="Choose the option that you prefer. Why do you prefer your choice? Explain the reasons for your choice. Write about 150-200 words.">
+        <input type="text" id="ed-t2-question" placeholder="Choose the option that you prefer. Why do you prefer your choice?">
       </div>
       <div class="field">
         <label>Option A</label>
-        <input type="text" id="ed-t2-optA" placeholder="I would like to have a vegetable and fruit market every Saturday in the park.">
+        <input type="text" id="ed-t2-optA" placeholder="I would like to have a vegetable and fruit market...">
       </div>
       <div class="field">
         <label>Option B</label>
-        <input type="text" id="ed-t2-optB" placeholder="I would like to have a second-hand furniture and appliance market every Saturday in the park.">
+        <input type="text" id="ed-t2-optB" placeholder="I would like to have a second-hand furniture market...">
       </div>
       <div class="field">
-        <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
+        <label>모범답안 (CLB 10, 선택사항)</label>
         <textarea id="ed-t2-model" placeholder="I would prefer..."></textarea>
       </div>
     </div>
@@ -163,18 +260,18 @@
 <div id="view-task1" class="hidden">
   <div class="header">
     <h1 id="t1-header">Writing Task 1: Writing an Email</h1>
-    <div class="timer" id="timer1wrap">Time remaining: <span id="timer1">27:00</span></div>
+    <div class="timer" id="timer1wrap">Time: <span id="timer1">27:00</span></div>
   </div>
   <div class="task-indicator">Task 1 of 2</div>
   <div class="container">
     <div class="left-panel">
-      <div class="instruction"><span class="info-icon">i</span>Read the following information.</div>
+      <div class="instruction"><span class="info-icon">i</span><span>Read the following information.</span></div>
       <div class="passage" id="t1-situation"></div>
-      <div class="instruction"><span class="info-icon">i</span>Write an email to this person in about 150-200 words. Your email should do the following things:</div>
+      <div class="instruction"><span class="info-icon">i</span><span>Write an email to this person in about 150-200 words. Your email should do the following things:</span></div>
       <ul class="bullet-list" id="t1-bullets"></ul>
     </div>
     <div class="right-panel">
-      <div class="instruction"><span class="info-icon">i</span>Write your email here (150-200 words).</div>
+      <div class="instruction"><span class="info-icon">i</span><span>Write your email here (150-200 words).</span></div>
       <div class="writing-area">
         <textarea class="essay" id="essay1" placeholder="Dear ..." spellcheck="true"></textarea>
         <div class="word-count" id="count1">Word count: 0 / 150-200 words</div>
@@ -191,12 +288,12 @@
 <div id="view-task2" class="hidden">
   <div class="header">
     <h1 id="t2-header">Writing Task 2: Responding to Survey Questions</h1>
-    <div class="timer" id="timer2wrap">Time remaining: <span id="timer2">26:00</span></div>
+    <div class="timer" id="timer2wrap">Time: <span id="timer2">26:00</span></div>
   </div>
   <div class="task-indicator">Task 2 of 2</div>
   <div class="container">
     <div class="left-panel">
-      <div class="instruction"><span class="info-icon">i</span>Read the following information.</div>
+      <div class="instruction"><span class="info-icon">i</span><span>Read the following information.</span></div>
       <div class="passage" id="t2-situation"></div>
       <div class="instruction"><span class="info-icon">i</span><span id="t2-question"></span></div>
     </div>
@@ -211,7 +308,7 @@
           <label for="optionB" id="labelB">Option B:</label>
         </div>
       </div>
-      <div class="instruction"><span class="info-icon">i</span>Explain the reasons for your choice. Write about 150-200 words.</div>
+      <div class="instruction"><span class="info-icon">i</span><span>Explain the reasons for your choice. Write about 150-200 words.</span></div>
       <div class="writing-area">
         <textarea class="essay" id="essay2" placeholder="I would prefer..." spellcheck="true"></textarea>
         <div class="word-count" id="count2">Word count: 0 / 150-200 words</div>
@@ -232,7 +329,7 @@
   </div>
   <div class="results-wrap">
     <p style="margin-top:15px;">
-      <button class="btn btn-copy" onclick="copyAll()">📋 채점용 전체 복사 (문제 + 내 답안 + 모범답안)</button>
+      <button class="btn btn-copy" onclick="copyAll()">📋 채점용 전체 복사</button>
       <span id="copiedMsg" class="copied-msg hidden">복사 완료! 채팅창에 붙여넣으세요.</span>
     </p>
 
@@ -254,7 +351,7 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'celpip_sets_v5';
+const STORAGE_KEY = 'celpip_sets_v6';
 const NUM_SETS = 50;
 let sets = loadSets();
 let currentSetId = null;
@@ -342,8 +439,8 @@ function saveSet() {
 function startTest(id) {
   currentSetId = id;
   const s = sets[id];
-  document.getElementById('t1-header').textContent = s.title + ' - Writing Task 1: Writing an Email';
-  document.getElementById('t2-header').textContent = s.title + ' - Writing Task 2: Responding to Survey Questions';
+  document.getElementById('t1-header').textContent = s.title + ' - Task 1: Email';
+  document.getElementById('t2-header').textContent = s.title + ' - Task 2: Survey';
   document.getElementById('t1-situation').textContent = s.task1.situation;
   document.getElementById('t2-situation').textContent = s.task2.situation;
   const bl = document.getElementById('t1-bullets');
@@ -438,7 +535,7 @@ function buildGradingText() {
   const wc1 = countWords(e1);
   const wc2 = countWords(e2);
 
-  return `===== CELPIP WRITING 채점 요청 (v5) =====
+  return `===== CELPIP WRITING 채점 요청 =====
 당신은 CELPIP 공식 인증 채점관입니다. 아래 응답을 CELPIP 공식 Writing Performance Standards와 Level Descriptors에 따라 정확하게 채점해 주세요.
 
 ▶ 채점 기준 (CELPIP 공식 4대 Dimension, 동일 비중)
