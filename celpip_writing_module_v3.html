@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CELPIP Writing Practice Module v3</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Malgun Gothic', sans-serif; background:#e8e8e8; }
+  .hidden { display:none !important; }
+
+  /* ===== 공통 헤더 ===== */
+  .header { background:#4a4a4a; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+  .header h1 { font-size:18px; font-weight:normal; }
+  .timer { font-size:16px; }
+  .timer span { font-weight:bold; color:#ffcc00; }
+  .timer.expired span { color:#ff5555; }
+  .task-indicator { background:#333; color:#fff; padding:5px 15px; font-size:14px; }
+
+  /* ===== 홈 화면 ===== */
+  .home-wrap { max-width:1200px; margin:20px auto; padding:0 20px; }
+  .home-toolbar { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+  .btn { padding:10px 20px; font-size:14px; cursor:pointer; border:none; border-radius:4px; }
+  .btn:hover { opacity:.85; }
+  .btn-home { background:#666; color:#fff; }
+  .btn-next { background:#0066cc; color:#fff; }
+  .btn-back { background:#666; color:#fff; }
+  .btn-submit { background:#28a745; color:#fff; }
+  .btn-save { background:#28a745; color:#fff; }
+  .btn-start { background:#0066cc; color:#fff; }
+  .btn-edit { background:#f0ad4e; color:#fff; }
+  .btn-copy { background:#17a2b8; color:#fff; }
+  .btn-export { background:#6f42c1; color:#fff; }
+  .btn-import { background:#6f42c1; color:#fff; }
+
+  .set-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:12px; }
+  .set-card { background:#fff; border:1px solid #ccc; border-radius:6px; padding:14px; }
+  .set-card h3 { font-size:15px; margin-bottom:6px; }
+  .set-status { font-size:12px; padding:2px 8px; border-radius:10px; display:inline-block; margin-bottom:8px; }
+  .status-empty { background:#eee; color:#888; }
+  .status-ready { background:#d4edda; color:#155724; }
+  .set-card .row { display:flex; gap:6px; }
+
+  /* ===== 에디터 ===== */
+  .editor-wrap { max-width:1000px; margin:20px auto; padding:0 20px 40px; }
+  .editor-section { background:#fff; border:1px solid #ccc; border-radius:6px; padding:20px; margin-bottom:20px; }
+  .editor-section h2 { font-size:16px; margin-bottom:12px; color:#0066cc; }
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:13px; font-weight:bold; margin-bottom:4px; color:#333; }
+  .field input[type=text], .field textarea { width:100%; padding:8px; font-size:14px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
+  .field textarea { min-height:90px; resize:vertical; line-height:1.5; }
+  .editor-actions { display:flex; gap:10px; }
+
+  /* ===== 시험 화면 ===== */
+  .container { display:flex; height:calc(100vh - 120px); }
+  .left-panel { width:40%; background:#f5f5f5; padding:20px; overflow-y:auto; border-right:1px solid #ccc; }
+  .right-panel { width:60%; background:#e6f3f7; padding:20px; display:flex; flex-direction:column; }
+  .info-icon { display:inline-block; width:24px; height:24px; background:#0066cc; color:#fff; border-radius:50%; text-align:center; line-height:24px; margin-right:10px; font-weight:bold; }
+  .instruction { color:#0066cc; font-size:16px; margin-bottom:20px; font-weight:bold; }
+  .passage { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; line-height:1.6; white-space:pre-wrap; }
+  .bullet-list { margin-left:40px; line-height:2; }
+  .options { margin:10px 0 20px; }
+  .option { margin:10px 0; display:flex; align-items:center; }
+  .option input[type=radio] { margin-right:10px; width:18px; height:18px; cursor:pointer; }
+  .option label { cursor:pointer; font-size:15px; }
+  .writing-area { flex:1; display:flex; flex-direction:column; }
+  textarea.essay { flex:1; padding:15px; font-size:15px; line-height:1.6; border:1px solid #ccc; resize:none; font-family:Arial,sans-serif; }
+  .word-count { padding:10px; background:#f0f0f0; text-align:right; font-size:14px; color:#666; }
+  .word-count.target { color:#0a8a00; font-weight:bold; }
+  .word-count.over { color:#cc0000; font-weight:bold; }
+  .nav-buttons { padding:15px 20px; background:#e8e8e8; display:flex; justify-content:space-between; }
+
+  /* ===== 결과 화면 ===== */
+  .results-wrap { max-width:900px; margin:20px auto; padding:0 20px 40px; }
+  .result-box { background:#f5f5f5; border:1px solid #ddd; padding:20px; margin:20px 0; }
+  .result-box h3 { margin-bottom:10px; }
+  .result-box pre { white-space:pre-wrap; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; background:#fff; padding:12px; border:1px solid #eee; }
+  .meta { margin-top:10px; color:#666; font-size:13px; }
+  .copied-msg { color:#28a745; font-weight:bold; margin-left:10px; }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div id="view-home">
+  <div class="header">
+    <h1>CELPIP Writing Practice Module</h1>
+    <div>50 Test Sets</div>
+  </div>
+  <div class="home-wrap">
+    <div class="home-toolbar">
+      <button class="btn btn-export" onclick="exportData()">⬇ 백업 (JSON 저장)</button>
+      <button class="btn btn-import" onclick="document.getElementById('importFile').click()">⬆ 복원 (JSON 불러오기)</button>
+      <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+      <span style="font-size:12px;color:#666;align-self:center;">데이터는 이 브라우저(localStorage)에 자동 저장됩니다. 기기 변경 시 백업 파일을 사용하세요.</span>
+    </div>
+    <div class="set-grid" id="setGrid"></div>
+  </div>
+</div>
+
+<!-- ============ EDITOR ============ -->
+<div id="view-editor" class="hidden">
+  <div class="header">
+    <h1 id="editorTitle">Set 편집</h1>
+    <button class="btn btn-home" onclick="goHome()">HOME</button>
+  </div>
+  <div class="editor-wrap">
+    <div class="editor-section">
+      <div class="field">
+        <label>Set 제목 (예: Practice Test 1)</label>
+        <input type="text" id="ed-title" placeholder="Set 1">
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <h2>Task 1: Writing an Email (27분)</h2>
+      <div class="field">
+        <label>상황 설명 (Situation)</label>
+        <textarea id="ed-t1-situation" placeholder="You recently attended a community picnic..."></textarea>
+      </div>
+      <div class="field">
+        <label>지시사항 (Bullets) — 한 줄에 하나씩</label>
+        <textarea id="ed-t1-bullets" placeholder="Express your overall enjoyment of last week's event.&#10;Explain why each potluck dish needs a list of ingredients.&#10;Describe how the potluck could be differently organized next year."></textarea>
+      </div>
+      <div class="field">
+        <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
+        <textarea id="ed-t1-model" placeholder="Dear Canada Day community picnic organizer..."></textarea>
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <h2>Task 2: Responding to Survey Questions (26분)</h2>
+      <div class="field">
+        <label>질문 (Question)</label>
+        <input type="text" id="ed-t2-question" placeholder="Choose the option that you prefer. Explain the reasons for your choice. Why do you prefer your choice? Write about 150-200 words.">
+      </div>
+      <div class="field">
+        <label>Option A</label>
+        <input type="text" id="ed-t2-optA" placeholder="Stop producing the print version of the newspaper.">
+      </div>
+      <div class="field">
+        <label>Option B</label>
+        <input type="text" id="ed-t2-optB" placeholder="Keep producing both the print and online versions.">
+      </div>
+      <div class="field">
+        <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
+        <textarea id="ed-t2-model" placeholder="I would recommend that..."></textarea>
+      </div>
+    </div>
+
+    <div class="editor-actions">
+      <button class="btn btn-save" onclick="saveSet()">저장</button>
+      <button class="btn btn-home" onclick="goHome()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TASK 1 ============ -->
+<div id="view-task1" class="hidden">
+  <div class="header">
+    <h1 id="t1-header">Writing Task 1: Writing an Email</h1>
+    <div class="timer" id="timer1wrap">Time remaining: <span id="timer1">27:00</span></div>
+  </div>
+  <div class="task-indicator">Task 1 of 2</div>
+  <div class="container">
+    <div class="left-panel">
+      <div class="instruction"><span class="info-icon">i</span>Read the following information.</div>
+      <div class="passage" id="t1-situation"></div>
+      <div class="instruction"><span class="info-icon">i</span>Write an email in about 150-200 words. Your email should do the following things:</div>
+      <ul class="bullet-list" id="t1-bullets"></ul>
+    </div>
+    <div class="right-panel">
+      <div class="instruction"><span class="info-icon">i</span>Write your email here (150-200 words).</div>
+      <div class="writing-area">
+        <textarea class="essay" id="essay1" placeholder="Dear ..." spellcheck="true"></textarea>
+        <div class="word-count" id="count1">Word count: 0 / 150-200 words</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn btn-home" onclick="confirmExit()">EXIT</button>
+    <button class="btn btn-next" onclick="nextTask()">NEXT</button>
+  </div>
+</div>
+
+<!-- ============ TASK 2 ============ -->
+<div id="view-task2" class="hidden">
+  <div class="header">
+    <h1 id="t2-header">Writing Task 2: Responding to Survey Questions</h1>
+    <div class="timer" id="timer2wrap">Time remaining: <span id="timer2">26:00</span></div>
+  </div>
+  <div class="task-indicator">Task 2 of 2</div>
+  <div class="container">
+    <div class="left-panel">
+      <div class="instruction"><span class="info-icon">i</span><span id="t2-question"></span></div>
+      <div class="passage" id="t2-instruction">Choose the option that you prefer. Explain the reasons for your choice. Write about 150-200 words.</div>
+    </div>
+    <div class="right-panel">
+      <div class="options">
+        <div class="option">
+          <input type="radio" id="optionA" name="choice" value="A">
+          <label for="optionA" id="labelA">Option A:</label>
+        </div>
+        <div class="option">
+          <input type="radio" id="optionB" name="choice" value="B">
+          <label for="optionB" id="labelB">Option B:</label>
+        </div>
+      </div>
+      <div class="instruction"><span class="info-icon">i</span>Explain the reasons for your choice. Write about 150-200 words.</div>
+      <div class="writing-area">
+        <textarea class="essay" id="essay2" placeholder="I would recommend that..." spellcheck="true"></textarea>
+        <div class="word-count" id="count2">Word count: 0 / 150-200 words</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn btn-back" onclick="prevTask()">BACK</button>
+    <button class="btn btn-submit" onclick="submitTest()">SUBMIT</button>
+  </div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="view-results" class="hidden">
+  <div class="header">
+    <h1>Test Completed — <span id="res-setname"></span></h1>
+    <button class="btn btn-home" onclick="goHome()">HOME</button>
+  </div>
+  <div class="results-wrap">
+    <p style="margin-top:15px;">
+      <button class="btn btn-copy" onclick="copyAll()">📋 채점용 전체 복사 (문제 + 내 답안 + 모범답안)</button>
+      <span id="copiedMsg" class="copied-msg hidden">복사 완료! 채팅창에 붙여넣으세요.</span>
+    </p>
+
+    <div class="result-box">
+      <h3>Task 1: Email</h3>
+      <pre id="res-essay1"></pre>
+      <div class="meta">Word count: <span id="res-count1"></span></div>
+    </div>
+
+    <div class="result-box">
+      <h3>Task 2: Survey Response</h3>
+      <p style="margin-bottom:8px;"><strong>Selected:</strong> <span id="res-option"></span></p>
+      <pre id="res-essay2"></pre>
+      <div class="meta">Word count: <span id="res-count2"></span></div>
+    </div>
+
+    <button class="btn btn-home" onclick="goHome()">HOME으로 돌아가기</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'celpip_sets_v3';
+const NUM_SETS = 50;
+let sets = loadSets();
+let currentSetId = null;
+let timer1Interval = null, timer2Interval = null;
+let time1 = 27*60, time2 = 26*60;
+
+/* ---------- 데이터 ---------- */
+function loadSets() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  const init = {};
+  for (let i=1; i<=NUM_SETS; i++) init[i] = emptySet(i);
+  return init;
+}
+function emptySet(id) {
+  return {
+    id: id,
+    title: 'Set ' + id,
+    task1: { situation:'', bullets:'', model:'' },
+    task2: { question:'', optionA:'', optionB:'', model:'' }
+  };
+}
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sets));
+}
+function isConfigured(s) {
+  return s.task1.situation.trim() && s.task2.question.trim();
+}
+
+/* ---------- 홈 ---------- */
+function renderHome() {
+  const grid = document.getElementById('setGrid');
+  grid.innerHTML = '';
+  for (let i=1; i<=NUM_SETS; i++) {
+    const s = sets[i];
+    const card = document.createElement('div');
+    card.className = 'set-card';
+    const ready = isConfigured(s);
+    card.innerHTML = `
+      <h3>${escapeHtml(s.title)}</h3>
+      <span class="set-status ${ready ? 'status-ready' : 'status-empty'}">${ready ? '문제 입력됨' : '비어 있음'}</span>
+      <div class="row">
+        <button class="btn btn-start" ${ready ? '' : 'disabled style="opacity:.4;cursor:not-allowed"'} onclick="startTest(${i})">시작</button>
+        <button class="btn btn-edit" onclick="openEditor(${i})">편집</button>
+      </div>`;
+    grid.appendChild(card);
+  }
+}
+
+/* ---------- 에디터 ---------- */
+function openEditor(id) {
+  currentSetId = id;
+  const s = sets[id];
+  document.getElementById('editorTitle').textContent = 'Set ' + id + ' 편집';
+  document.getElementById('ed-title').value = s.title;
+  document.getElementById('ed-t1-situation').value = s.task1.situation;
+  document.getElementById('ed-t1-bullets').value = s.task1.bullets;
+  document.getElementById('ed-t1-model').value = s.task1.model;
+  document.getElementById('ed-t2-question').value = s.task2.question;
+  document.getElementById('ed-t2-optA').value = s.task2.optionA;
+  document.getElementById('ed-t2-optB').value = s.task2.optionB;
+  document.getElementById('ed-t2-model').value = s.task2.model;
+  showView('view-editor');
+}
+function saveSet() {
+  const s = sets[currentSetId];
+  s.title = document.getElementById('ed-title').value.trim() || ('Set ' + currentSetId);
+  s.task1.situation = document.getElementById('ed-t1-situation').value;
+  s.task1.bullets = document.getElementById('ed-t1-bullets').value;
+  s.task1.model = document.getElementById('ed-t1-model').value;
+  s.task2.question = document.getElementById('ed-t2-question').value;
+  s.task2.optionA = document.getElementById('ed-t2-optA').value;
+  s.task2.optionB = document.getElementById('ed-t2-optB').value;
+  s.task2.model = document.getElementById('ed-t2-model').value;
+  persist();
+  alert('저장되었습니다.');
+  goHome();
+}
+
+/* ---------- 시험 ---------- */
+function startTest(id) {
+  currentSetId = id;
+  const s = sets[id];
+  document.getElementById('t1-header').textContent = s.title + ' - Writing Task 1: Writing an Email';
+  document.getElementById('t2-header').textContent = s.title + ' - Writing Task 2: Responding to Survey Questions';
+  document.getElementById('t1-situation').textContent = s.task1.situation;
+  const bl = document.getElementById('t1-bullets');
+  bl.innerHTML = '';
+  s.task1.bullets.split('\n').filter(l=>l.trim()).forEach(l => {
+    const li = document.createElement('li');
+    li.textContent = l.trim();
+    bl.appendChild(li);
+  });
+  document.getElementById('t2-question').textContent = s.task2.question || 'Choose the option that you prefer. Explain the reasons for your choice. Why do you prefer your choice? Write about 150-200 words.';
+  document.getElementById('labelA').textContent = 'Option A: ' + s.task2.optionA;
+  document.getElementById('labelB').textContent = 'Option B: ' + s.task2.optionB;
+
+  document.getElementById('essay1').value = '';
+  document.getElementById('essay2').value = '';
+  document.getElementById('optionA').checked = false;
+  document.getElementById('optionB').checked = false;
+  updateCount('essay1','count1');
+  updateCount('essay2','count2');
+
+  if (!confirm(s.title + ' 시험을 시작합니다.\nTask 1 타이머(27분)가 바로 시작됩니다. 준비되셨습니까?')) return;
+
+  stopTimers();
+  time1 = 27*60; time2 = 26*60;
+  document.getElementById('timer1wrap').classList.remove('expired');
+  document.getElementById('timer2wrap').classList.remove('expired');
+  renderTimer('timer1', time1);
+  timer1Interval = setInterval(() => tick('timer1','timer1wrap',()=>time1--,()=>time1, autoAdvance1), 1000);
+  showView('view-task1');
+}
+function tick(timerId, wrapId, dec, get, onExpire) {
+  if (get() > 0) {
+    dec();
+    renderTimer(timerId, get());
+  } else {
+    document.getElementById(wrapId).classList.add('expired');
+    clearInterval(timerId === 'timer1' ? timer1Interval : timer2Interval);
+    if (onExpire) onExpire();
+  }
+}
+function autoAdvance1() {
+  alert('Task 1 시간이 종료되었습니다. Task 2로 이동합니다.');
+  nextTask();
+}
+function autoSubmit() {
+  alert('Task 2 시간이 종료되었습니다. 자동으로 제출됩니다.');
+  submitTest();
+}
+function nextTask() {
+  clearInterval(timer1Interval);
+  renderTimer('timer2', time2);
+  timer2Interval = setInterval(() => tick('timer2','timer2wrap',()=>time2--,()=>time2, autoSubmit), 1000);
+  showView('view-task2');
+}
+function prevTask() {
+  clearInterval(timer2Interval);
+  timer1Interval = setInterval(() => tick('timer1','timer1wrap',()=>time1--,()=>time1, autoAdvance1), 1000);
+  showView('view-task1');
+}
+function confirmExit() {
+  if (confirm('시험을 중단하고 홈으로 돌아가시겠습니까? 작성 내용은 저장되지 않습니다.')) {
+    stopTimers();
+    goHome();
+  }
+}
+function submitTest() {
+  stopTimers();
+  const s = sets[currentSetId];
+  const e1 = document.getElementById('essay1').value;
+  const e2 = document.getElementById('essay2').value;
+  const opt = document.querySelector('input[name="choice"]:checked');
+
+  document.getElementById('res-setname').textContent = s.title;
+  document.getElementById('res-essay1').textContent = e1 || '(미작성)';
+  document.getElementById('res-essay2').textContent = e2 || '(미작성)';
+  document.getElementById('res-count1').textContent = countWords(e1);
+  document.getElementById('res-count2').textContent = countWords(e2);
+  document.getElementById('res-option').textContent = opt
+    ? (opt.value === 'A' ? 'Option A: ' + s.task2.optionA : 'Option B: ' + s.task2.optionB)
+    : '(선택 안 함)';
+  document.getElementById('copiedMsg').classList.add('hidden');
+  showView('view-results');
+}
+
+/* ---------- 채점용 복사 ---------- */
+function buildGradingText() {
+  const s = sets[currentSetId];
+  const e1 = document.getElementById('essay1').value;
+  const e2 = document.getElementById('essay2').value;
+  const opt = document.querySelector('input[name="choice"]:checked');
+  const optText = opt ? (opt.value === 'A' ? s.task2.optionA : s.task2.optionB) : '(선택 안 함)';
+
+  return `===== CELPIP WRITING 채점 요청 =====
+아래 내용을 CELPIP 공식 채점 기준(Content/Coherence, Vocabulary, Readability, Task Fulfillment 4개 항목 동일 비중)에 따라 Task별 CLB 3~12점으로 채점하고, 최종 점수는 두 Task의 평균으로 산출해 주세요. 모범답안(CLB 10)은 참고 기준으로만 사용하고, 동일할 필요는 없습니다. 각 항목별 감점/가점 근거와 개선 팁도 함께 알려주세요.
+
+----- [TASK 1 QUESTION: Writing an Email] -----
+Situation:
+${s.task1.situation}
+
+Instructions (bullets):
+${s.task1.bullets}
+
+----- [MY TASK 1 RESPONSE] (${countWords(e1)} words) -----
+${e1}
+
+----- [TASK 1 MODEL ANSWER - CLB 10 참고용] -----
+${s.task1.model || '(모범답안 미입력)'}
+
+----- [TASK 2 QUESTION: Responding to Survey Questions] -----
+Question: ${s.task2.question}
+Option A: ${s.task2.optionA}
+Option B: ${s.task2.optionB}
+My Selected Option: ${opt ? opt.value : '미선택'} - ${optText}
+
+----- [MY TASK 2 RESPONSE] (${countWords(e2)} words) -----
+${e2}
+
+----- [TASK 2 MODEL ANSWER - CLB 10 참고용] -----
+${s.task2.model || '(모범답안 미입력)'}
+===== 채점 요청 끝 =====`;
+}
+function copyAll() {
+  const text = buildGradingText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied, () => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showCopied();
+}
+function showCopied() {
+  document.getElementById('copiedMsg').classList.remove('hidden');
+}
+
+/* ---------- 백업/복원 ---------- */
+function exportData() {
+  const blob = new Blob([JSON.stringify(sets, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'celpip_sets_backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (confirm('백업 파일을 불러오면 현재 저장된 모든 Set이 덮어씌워집니다. 계속하시겠습니까?')) {
+        sets = data;
+        persist();
+        renderHome();
+        alert('복원 완료되었습니다.');
+      }
+    } catch(err) {
+      alert('파일 형식이 올바르지 않습니다.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ---------- 유틸 ---------- */
+function countWords(text) {
+  return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+function updateCount(textareaId, countId) {
+  const t = document.getElementById(textareaId);
+  const c = document.getElementById(countId);
+  const n = countWords(t.value);
+  c.textContent = `Word count: ${n} / 150-200 words`;
+  c.className = 'word-count' + (n >= 150 && n <= 200 ? ' target' : (n > 200 ? ' over' : ''));
+}
+function renderTimer(id, t) {
+  const m = Math.floor(t/60), s = t%60;
+  document.getElementById(id).textContent = m + ':' + s.toString().padStart(2,'0');
+}
+function stopTimers() {
+  clearInterval(timer1Interval);
+  clearInterval(timer2Interval);
+}
+function showView(id) {
+  ['view-home','view-editor','view-task1','view-task2','view-results'].forEach(v => {
+    document.getElementById(v).classList.toggle('hidden', v !== id);
+  });
+  window.scrollTo(0,0);
+}
+function goHome() {
+  stopTimers();
+  renderHome();
+  showView('view-home');
+}
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('essay1').addEventListener('input', () => updateCount('essay1','count1'));
+document.getElementById('essay2').addEventListener('input', () => updateCount('essay2','count2'));
+
+renderHome();
+</script>
+</body>
+</html>
