@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CELPIP Writing Practice Module v4</title>
+<title>CELPIP Writing Practice Module v5</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family: Arial, 'Malgun Gothic', sans-serif; background:#e8e8e8; }
@@ -60,9 +60,9 @@
   .passage { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; line-height:1.6; white-space:pre-wrap; }
   .bullet-list { margin-left:40px; line-height:2; }
   .options { margin:10px 0 20px; }
-  .option { margin:10px 0; display:flex; align-items:center; }
-  .option input[type=radio] { margin-right:10px; width:18px; height:18px; cursor:pointer; }
-  .option label { cursor:pointer; font-size:15px; }
+  .option { margin:10px 0; display:flex; align-items:flex-start; }
+  .option input[type=radio] { margin-right:10px; margin-top:3px; width:18px; height:18px; cursor:pointer; flex-shrink:0; }
+  .option label { cursor:pointer; font-size:15px; line-height:1.5; }
   .writing-area { flex:1; display:flex; flex-direction:column; }
   textarea.essay { flex:1; padding:15px; font-size:15px; line-height:1.6; border:1px solid #ccc; resize:none; font-family:Arial,sans-serif; }
   .word-count { padding:10px; background:#f0f0f0; text-align:right; font-size:14px; color:#666; }
@@ -115,36 +115,40 @@
     <div class="editor-section">
       <h2>Task 1: Writing an Email (27분)</h2>
       <div class="field">
-        <label>상황 설명 (Situation)</label>
-        <textarea id="ed-t1-situation" placeholder="You recently attended a community picnic..."></textarea>
+        <label>상황 설명 (Read the following information)</label>
+        <textarea id="ed-t1-situation" placeholder="You are a high school teacher. A student of yours has just graduated with excellent marks from high school. This person wants to find work."></textarea>
       </div>
       <div class="field">
         <label>지시사항 (Bullets) — 한 줄에 하나씩</label>
-        <textarea id="ed-t1-bullets" placeholder="Express your overall enjoyment of last week's event.&#10;Explain why each potluck dish needs a list of ingredients.&#10;Describe how the potluck could be differently organized next year."></textarea>
+        <textarea id="ed-t1-bullets" placeholder="Explain how you feel about her high school grades.&#10;Explain why a college education is good.&#10;Explain why going to work instead of college is unwise."></textarea>
       </div>
       <div class="field">
         <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
-        <textarea id="ed-t1-model" placeholder="Dear Canada Day community picnic organizer..."></textarea>
+        <textarea id="ed-t1-model" placeholder="Dear ..."></textarea>
       </div>
     </div>
 
     <div class="editor-section">
       <h2>Task 2: Responding to Survey Questions (26분)</h2>
       <div class="field">
+        <label>상황 설명 (Read the following information)</label>
+        <textarea id="ed-t2-situation" placeholder="Your community centre is surveying your opinion on a new event happening every Saturday in the park near your home. There are two events being considered. One suggestion is a vegetable and fruit market. The other suggestion is a second-hand furniture and appliance market."></textarea>
+      </div>
+      <div class="field">
         <label>질문 (Question)</label>
-        <input type="text" id="ed-t2-question" placeholder="Choose the option that you prefer. Explain the reasons for your choice. Why do you prefer your choice? Write about 150-200 words.">
+        <input type="text" id="ed-t2-question" placeholder="Choose the option that you prefer. Why do you prefer your choice? Explain the reasons for your choice. Write about 150-200 words.">
       </div>
       <div class="field">
         <label>Option A</label>
-        <input type="text" id="ed-t2-optA" placeholder="Stop producing the print version of the newspaper.">
+        <input type="text" id="ed-t2-optA" placeholder="I would like to have a vegetable and fruit market every Saturday in the park.">
       </div>
       <div class="field">
         <label>Option B</label>
-        <input type="text" id="ed-t2-optB" placeholder="Keep producing both the print and online versions.">
+        <input type="text" id="ed-t2-optB" placeholder="I would like to have a second-hand furniture and appliance market every Saturday in the park.">
       </div>
       <div class="field">
         <label>모범답안 (CLB 10, 선택사항 — 채점 참고용)</label>
-        <textarea id="ed-t2-model" placeholder="I would recommend that..."></textarea>
+        <textarea id="ed-t2-model" placeholder="I would prefer..."></textarea>
       </div>
     </div>
 
@@ -166,7 +170,7 @@
     <div class="left-panel">
       <div class="instruction"><span class="info-icon">i</span>Read the following information.</div>
       <div class="passage" id="t1-situation"></div>
-      <div class="instruction"><span class="info-icon">i</span>Write an email in about 150-200 words. Your email should do the following things:</div>
+      <div class="instruction"><span class="info-icon">i</span>Write an email to this person in about 150-200 words. Your email should do the following things:</div>
       <ul class="bullet-list" id="t1-bullets"></ul>
     </div>
     <div class="right-panel">
@@ -192,8 +196,9 @@
   <div class="task-indicator">Task 2 of 2</div>
   <div class="container">
     <div class="left-panel">
+      <div class="instruction"><span class="info-icon">i</span>Read the following information.</div>
+      <div class="passage" id="t2-situation"></div>
       <div class="instruction"><span class="info-icon">i</span><span id="t2-question"></span></div>
-      <div class="passage" id="t2-instruction">Choose the option that you prefer. Explain the reasons for your choice. Write about 150-200 words.</div>
     </div>
     <div class="right-panel">
       <div class="options">
@@ -208,7 +213,7 @@
       </div>
       <div class="instruction"><span class="info-icon">i</span>Explain the reasons for your choice. Write about 150-200 words.</div>
       <div class="writing-area">
-        <textarea class="essay" id="essay2" placeholder="I would recommend that..." spellcheck="true"></textarea>
+        <textarea class="essay" id="essay2" placeholder="I would prefer..." spellcheck="true"></textarea>
         <div class="word-count" id="count2">Word count: 0 / 150-200 words</div>
       </div>
     </div>
@@ -249,7 +254,7 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'celpip_sets_v4';
+const STORAGE_KEY = 'celpip_sets_v5';
 const NUM_SETS = 50;
 let sets = loadSets();
 let currentSetId = null;
@@ -271,14 +276,14 @@ function emptySet(id) {
     id: id,
     title: 'Set ' + id,
     task1: { situation:'', bullets:'', model:'' },
-    task2: { question:'', optionA:'', optionB:'', model:'' }
+    task2: { situation:'', question:'', optionA:'', optionB:'', model:'' }
   };
 }
 function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sets));
 }
 function isConfigured(s) {
-  return s.task1.situation.trim() && s.task2.question.trim();
+  return s.task1.situation.trim() && s.task2.situation.trim();
 }
 
 /* ---------- 홈 ---------- */
@@ -310,6 +315,7 @@ function openEditor(id) {
   document.getElementById('ed-t1-situation').value = s.task1.situation;
   document.getElementById('ed-t1-bullets').value = s.task1.bullets;
   document.getElementById('ed-t1-model').value = s.task1.model;
+  document.getElementById('ed-t2-situation').value = s.task2.situation;
   document.getElementById('ed-t2-question').value = s.task2.question;
   document.getElementById('ed-t2-optA').value = s.task2.optionA;
   document.getElementById('ed-t2-optB').value = s.task2.optionB;
@@ -322,6 +328,7 @@ function saveSet() {
   s.task1.situation = document.getElementById('ed-t1-situation').value;
   s.task1.bullets = document.getElementById('ed-t1-bullets').value;
   s.task1.model = document.getElementById('ed-t1-model').value;
+  s.task2.situation = document.getElementById('ed-t2-situation').value;
   s.task2.question = document.getElementById('ed-t2-question').value;
   s.task2.optionA = document.getElementById('ed-t2-optA').value;
   s.task2.optionB = document.getElementById('ed-t2-optB').value;
@@ -338,6 +345,7 @@ function startTest(id) {
   document.getElementById('t1-header').textContent = s.title + ' - Writing Task 1: Writing an Email';
   document.getElementById('t2-header').textContent = s.title + ' - Writing Task 2: Responding to Survey Questions';
   document.getElementById('t1-situation').textContent = s.task1.situation;
+  document.getElementById('t2-situation').textContent = s.task2.situation;
   const bl = document.getElementById('t1-bullets');
   bl.innerHTML = '';
   s.task1.bullets.split('\n').filter(l=>l.trim()).forEach(l => {
@@ -345,7 +353,7 @@ function startTest(id) {
     li.textContent = l.trim();
     bl.appendChild(li);
   });
-  document.getElementById('t2-question').textContent = s.task2.question || 'Choose the option that you prefer. Explain the reasons for your choice. Why do you prefer your choice? Write about 150-200 words.';
+  document.getElementById('t2-question').textContent = s.task2.question || 'Choose the option that you prefer. Why do you prefer your choice? Explain the reasons for your choice. Write about 150-200 words.';
   document.getElementById('labelA').textContent = 'Option A: ' + s.task2.optionA;
   document.getElementById('labelB').textContent = 'Option B: ' + s.task2.optionB;
 
@@ -430,7 +438,7 @@ function buildGradingText() {
   const wc1 = countWords(e1);
   const wc2 = countWords(e2);
 
-  return `===== CELPIP WRITING 채점 요청 (v4) =====
+  return `===== CELPIP WRITING 채점 요청 (v5) =====
 당신은 CELPIP 공식 인증 채점관입니다. 아래 응답을 CELPIP 공식 Writing Performance Standards와 Level Descriptors에 따라 정확하게 채점해 주세요.
 
 ▶ 채점 기준 (CELPIP 공식 4대 Dimension, 동일 비중)
@@ -491,6 +499,9 @@ ${e1}
 ${s.task1.model || '(모범답안 미입력)'}
 
 ----- [TASK 2 QUESTION: Responding to Survey Questions] -----
+Survey Information:
+${s.task2.situation}
+
 Question: ${s.task2.question}
 Option A: ${s.task2.optionA}
 Option B: ${s.task2.optionB}
