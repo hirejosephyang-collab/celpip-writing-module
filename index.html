@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CELPIP Writing Practice Module v7</title>
+<title>CELPIP Writing Practice Module v8</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family: Arial, 'Malgun Gothic', sans-serif; background:#e8e8e8; }
@@ -85,8 +85,8 @@
   /* ===== 단어장 ===== */
   .vocab-wrap { max-width:1000px; margin:20px auto; padding:0 20px 40px; }
   .vocab-toolbar { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; align-items:center; }
-  .vocab-add { display:flex; gap:8px; margin-bottom:15px; }
-  .vocab-add input { flex:1; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px; }
+  .vocab-add { display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap; }
+  .vocab-add input { flex:1; min-width:200px; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:4px; }
   .vocab-stats { font-size:13px; color:#666; margin-bottom:12px; }
   .vocab-list { display:flex; flex-direction:column; gap:10px; }
   .vocab-item { background:#fff; border:1px solid #ccc; border-radius:6px; padding:14px; }
@@ -390,6 +390,16 @@
       <input type="text" id="vocab-new-word" placeholder="새 단어 입력 (예: resolve)">
       <button class="btn btn-vocab" onclick="addWordFromVocab()">단어 추가</button>
       <button class="btn btn-flash" onclick="startFlashcards()">🃏 플래시카드 학습</button>
+      <button class="btn btn-import" onclick="toggleBulkBox()">📥 단어 대량 추가</button>
+    </div>
+
+    <div class="paste-box hidden" id="bulk-box">
+      <p style="font-size:13px;margin-bottom:8px;color:#666;">엑셀이나 메모장에서 복사한 단어 목록을 붙여넣으세요. 한 줄에 단어 하나씩 입력되어 있으면 자동으로 분리됩니다. 이미 있는 단어는 건너뜁니다.</p>
+      <textarea id="bulk-area" placeholder="Neolithic-period&#10;bark tar&#10;antiseptic&#10;spruce trees&#10;..."></textarea>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn btn-save" onclick="bulkAddWords()">일괄 추가</button>
+        <button class="btn btn-home" onclick="toggleBulkBox()">닫기</button>
+      </div>
     </div>
 
     <div class="vocab-stats" id="vocab-stats"></div>
@@ -533,6 +543,42 @@ function addWordFromVocab() {
     renderVocab();
   }
 }
+
+/* ---------- 대량 단어 추가 ---------- */
+function toggleBulkBox() {
+  document.getElementById('bulk-box').classList.toggle('hidden');
+}
+function bulkAddWords() {
+  const text = document.getElementById('bulk-area').value;
+  if (!text.trim()) { alert('단어 목록을 붙여넣으세요.'); return; }
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  let added = 0;
+  const dupList = [];
+  lines.forEach(line => {
+    const w = line.toLowerCase();
+    if (vocab.some(v => v.word === w)) { dupList.push(line); return; }
+    vocab.push({
+      id: Date.now() + added + Math.random(),
+      word: w,
+      source: '대량 추가',
+      status: 'pending',
+      meaning: '', synonyms: [], antonyms: [], example: '', upgrade: '',
+      correct: 0, wrong: 0,
+      createdAt: new Date().toISOString().slice(0,10)
+    });
+    added++;
+  });
+  persistVocab();
+  document.getElementById('bulk-area').value = '';
+  toggleBulkBox();
+  renderVocab();
+  let msg = added + '개 단어가 추가되었습니다.';
+  if (dupList.length > 0) {
+    msg += '\n중복으로 건너뛴 단어 ' + dupList.length + '개: ' + dupList.slice(0,5).join(', ') + (dupList.length > 5 ? ' 외' : '');
+  }
+  alert(msg + '\n\n이제 "AI 분석 요청 복사"로 일괄 분석을 요청하세요.');
+}
+
 function deleteWord(id) {
   if (!confirm('이 단어를 삭제하시겠습니까?')) return;
   vocab = vocab.filter(v => v.id !== id);
