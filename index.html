@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CELPIP Writing Practice Module v9</title>
+<title>CELPIP Writing Practice Module v10</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family: Arial, 'Malgun Gothic', sans-serif; background:#e8e8e8; }
@@ -31,6 +31,7 @@
   .btn-vocab { background:#e8590c; color:#fff; }
   .btn-flash { background:#d6336c; color:#fff; }
   .btn-errors { background:#5f3dc4; color:#fff; }
+  .btn-tpl { background:#087f5b; color:#fff; padding:8px 14px; min-height:0; font-size:13px; }
   .btn-del { background:#dc3545; color:#fff; padding:6px 12px; min-height:0; font-size:12px; }
 
   .home-wrap { max-width:1200px; margin:20px auto; padding:0 20px; }
@@ -58,15 +59,26 @@
   .left-panel { width:40%; background:#f5f5f5; padding:20px; overflow-y:auto; border-right:1px solid #ccc; }
   .right-panel { width:60%; background:#e6f3f7; padding:20px; display:flex; flex-direction:column; }
   .info-icon { display:inline-block; width:24px; height:24px; background:#0066cc; color:#fff; border-radius:50%; text-align:center; line-height:24px; margin-right:10px; font-weight:bold; flex-shrink:0; }
-  .instruction { color:#0066cc; font-size:16px; margin-bottom:20px; font-weight:bold; display:flex; align-items:flex-start; }
+  .instruction { color:#0066cc; font-size:16px; margin-bottom:12px; font-weight:bold; display:flex; align-items:flex-start; }
   .passage { background:#fff; padding:15px; border:1px solid #ddd; margin-bottom:20px; line-height:1.6; white-space:pre-wrap; font-size:15px; }
   .bullet-list { margin-left:40px; line-height:2; font-size:15px; }
   .options { margin:10px 0 20px; }
   .option { margin:12px 0; display:flex; align-items:flex-start; }
   .option input[type=radio] { margin-right:12px; margin-top:2px; width:22px; height:22px; cursor:pointer; flex-shrink:0; }
   .option label { cursor:pointer; font-size:15px; line-height:1.5; }
-  .writing-area { flex:1; display:flex; flex-direction:column; min-height:200px; }
+
+  /* ===== 템플릿 + 작성 영역 ===== */
+  .tpl-toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .tpl-reco { font-size:12px; color:#087f5b; font-weight:bold; }
+  .body-row { flex:1; display:flex; gap:12px; min-height:0; }
+  .tpl-pane { width:45%; background:#fff; border:1px solid #ccc; border-radius:6px; display:flex; flex-direction:column; min-height:0; }
+  .tpl-head { padding:8px; border-bottom:1px solid #eee; }
+  .tpl-head select { width:100%; padding:8px; font-size:13px; border:1px solid #ccc; border-radius:4px; }
+  .tpl-content { flex:1; overflow-y:auto; padding:12px; font-size:13px; line-height:1.75; white-space:pre-wrap; color:#333; }
+  .tpl-content .ph { background:#ffe3e3; color:#c92a2a; font-weight:bold; padding:0 2px; border-radius:3px; }
+  .writing-area { flex:1; display:flex; flex-direction:column; min-height:200px; min-width:0; }
   textarea.essay { flex:1; padding:15px; font-size:16px; line-height:1.6; border:1px solid #ccc; resize:none; font-family:Arial,sans-serif; min-height:150px; }
+
   .word-count { padding:10px; background:#f0f0f0; text-align:right; font-size:14px; color:#666; }
   .word-count.target { color:#0a8a00; font-weight:bold; }
   .word-count.over { color:#cc0000; font-weight:bold; }
@@ -164,8 +176,10 @@
     .left-panel, .right-panel { width:100%; }
     .left-panel { border-right:none; border-bottom:1px solid #ccc; max-height:50vh; overflow-y:auto; }
     .right-panel { min-height:50vh; }
+    .body-row { flex-direction:column; }
+    .tpl-pane { width:100%; max-height:35vh; }
     .info-icon { width:20px; height:20px; line-height:20px; font-size:12px; }
-    .instruction { font-size:14px; margin-bottom:15px; }
+    .instruction { font-size:14px; margin-bottom:12px; }
     .passage { font-size:14px; padding:12px; }
     .bullet-list { margin-left:20px; font-size:14px; line-height:1.8; }
     .option input[type=radio] { width:24px; height:24px; }
@@ -174,6 +188,7 @@
     .word-count { font-size:13px; }
     .nav-buttons { padding:12px 15px; }
     .btn { padding:12px 16px; font-size:14px; flex:1; }
+    .btn-tpl { padding:8px 12px; flex:none; }
     .home-wrap, .vocab-wrap, .flash-wrap, .errors-wrap { padding:0 15px 30px; }
     .set-grid { grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; }
     .set-card { padding:12px; }
@@ -321,12 +336,22 @@
     </div>
     <div class="right-panel">
       <div class="instruction"><span class="info-icon">i</span><span>Write your email here (150-200 words).</span></div>
-      <div class="writing-area">
-        <textarea class="essay" id="essay1" placeholder="Dear ..." spellcheck="true"></textarea>
-        <div class="word-count" id="count1">Word count: 0 / 150-200 words</div>
-        <div class="quick-word">
-          <input type="text" id="qw1" placeholder="모르는 단어 입력 → 저장">
-          <button class="btn btn-vocab" onclick="quickAddWord('qw1','Task 1')">단어 저장</button>
+      <div class="tpl-toggle-row">
+        <button class="btn btn-tpl" id="tpl-btn-1" onclick="toggleTemplate(1)">📄 템플릿 보기</button>
+        <span class="tpl-reco" id="tpl-reco-1"></span>
+      </div>
+      <div class="body-row">
+        <div class="tpl-pane hidden" id="tpl-pane-1">
+          <div class="tpl-head"><select id="tpl-select-1" onchange="renderTemplate(1)"></select></div>
+          <div class="tpl-content" id="tpl-content-1"></div>
+        </div>
+        <div class="writing-area">
+          <textarea class="essay" id="essay1" placeholder="Dear ..." spellcheck="true"></textarea>
+          <div class="word-count" id="count1">Word count: 0 / 150-200 words</div>
+          <div class="quick-word">
+            <input type="text" id="qw1" placeholder="모르는 단어 입력 → 저장">
+            <button class="btn btn-vocab" onclick="quickAddWord('qw1','Task 1')">단어 저장</button>
+          </div>
         </div>
       </div>
     </div>
@@ -362,12 +387,22 @@
         </div>
       </div>
       <div class="instruction"><span class="info-icon">i</span><span>Explain the reasons for your choice. Write about 150-200 words.</span></div>
-      <div class="writing-area">
-        <textarea class="essay" id="essay2" placeholder="I would prefer..." spellcheck="true"></textarea>
-        <div class="word-count" id="count2">Word count: 0 / 150-200 words</div>
-        <div class="quick-word">
-          <input type="text" id="qw2" placeholder="모르는 단어 입력 → 저장">
-          <button class="btn btn-vocab" onclick="quickAddWord('qw2','Task 2')">단어 저장</button>
+      <div class="tpl-toggle-row">
+        <button class="btn btn-tpl" id="tpl-btn-2" onclick="toggleTemplate(2)">📄 템플릿 보기</button>
+        <span class="tpl-reco" id="tpl-reco-2"></span>
+      </div>
+      <div class="body-row">
+        <div class="tpl-pane hidden" id="tpl-pane-2">
+          <div class="tpl-head"><select id="tpl-select-2" onchange="renderTemplate(2)"></select></div>
+          <div class="tpl-content" id="tpl-content-2"></div>
+        </div>
+        <div class="writing-area">
+          <textarea class="essay" id="essay2" placeholder="I would prefer..." spellcheck="true"></textarea>
+          <div class="word-count" id="count2">Word count: 0 / 150-200 words</div>
+          <div class="quick-word">
+            <input type="text" id="qw2" placeholder="모르는 단어 입력 → 저장">
+            <button class="btn btn-vocab" onclick="quickAddWord('qw2','Task 2')">단어 저장</button>
+          </div>
         </div>
       </div>
     </div>
@@ -582,6 +617,296 @@ let errors = loadErrors();
 let currentSetId = null;
 let timer1Interval = null, timer2Interval = null;
 let time1 = 27*60, time2 = 26*60;
+
+/* ================================================================
+   템플릿 데이터 (Top 10 Task 1 + Top 10 Task 2)
+   ================================================================ */
+const T1_TEMPLATES = [
+{ name:'1. Email of Complaint', kw:['complaint','dissatisf','disappoint','unhappy','problem','issue','poor service','terrible'], body:
+`Subject: Dissatisfaction with Recent Experience
+
+Dear [Recipient's Name],
+
+I hope this email finds you well. My name is [Your Name], and I am writing to express my disappointment with [Product/Service/Experience] I recently had with [Company Name].
+
+Firstly, I would like to bring to your attention the issue I encountered during my recent interaction with your [product/service/representative]. On [date], I experienced [describe the problem or situation in detail, including any inconveniences or negative impacts it had on you].
+
+Secondly, despite my attempts to resolve the matter at the time, the issue remains unresolved. I believe that [state your expectations for resolution, such as a refund, replacement, or compensation] would be appropriate in this situation.
+
+Furthermore, I would like to request [specific action you would like to be taken] to rectify this situation. Moreover, I would appreciate it if you could provide an explanation for the inconvenience caused and outline steps to prevent similar occurrences in the future.
+
+Thank you for your attention to this matter.
+
+Sincerely,
+[Your Name]` },
+{ name:'2. Email of Request', kw:['request','refund','repair','reservation','ask for','advice'], body:
+`Subject: Request for [Refund/Repair/Advice/Reservation]
+
+Dear [Recipient's Name],
+
+I hope this email finds you well. My name is [Your Name], and I am reaching out to request your assistance with [specific request].
+
+Firstly, I would like to provide context for my request. [Explain the reason for your request and provide any necessary details or documentation]. This situation has prompted me to seek [state the action you are requesting, e.g., process a refund, arrange for a repair, provide advice, make a reservation, etc.].
+
+Moreover, I would appreciate your prompt attention to this matter. Secondly, I kindly request that you [outline any additional steps or actions you would like the recipient to take].
+
+Thank you for your prompt attention to this matter.
+
+Best regards,
+[Your Name]` },
+{ name:'3. Email of Enquiry', kw:['inquir','enquir','information about','question about','booking'], body:
+`Subject: Inquiry Regarding [Information Request/Booking]
+
+Dear [Recipient's Name],
+
+I hope this email finds you in good spirits. My name is [Your Name], and I am writing to inquire about [specific information/booking].
+
+Firstly, I would like to provide some background information. [Clearly state your questions or the information you are seeking, providing any necessary context or details]. This information will greatly assist me in [explain why you need the information or booking].
+
+Furthermore, I would appreciate it if you could provide me with [the requested information or confirmation of the booking]. Additionally, should you require any further details from my end, please do not hesitate to ask.
+
+Thank you for your assistance.
+
+Kind regards,
+[Your Name]` },
+{ name:'4. Email of Recommendation', kw:['recommend','candidate','position','colleague','commendation'], body:
+`Subject: Recommendation for [Job/Colleague]
+
+Dear [Recipient's Name],
+
+I trust you are doing well. I am writing to you today to highly recommend [Name of the person you are recommending] for [specific position or commendation].
+
+Firstly, I would like to highlight [Name]'s exceptional qualifications and skills. [Describe the person's qualifications, skills, and positive attributes, providing specific examples or instances where possible]. Their dedication and professionalism make them a standout candidate for [the position/commendation].
+
+Moreover, I am confident that [he/she/they] would be a valuable asset to [the organization/department/team] and would excel in [his/her/their] new role. Furthermore, [Name]'s positive attitude and ability to [mention any additional strengths or capabilities] would undoubtedly contribute to the success of [the organization/department/team].
+
+Thank you for considering my recommendation.
+
+Warm regards,
+[Your Name]` },
+{ name:'5. Email of Suggestion', kw:['suggest','improve','idea','proposal','change','differently','better way'], body:
+`Subject: Suggestion for [Ideas/Plans/Solutions]
+
+Dear [Recipient's Name],
+
+I hope this email finds you well. I wanted to take a moment to share some thoughts and suggestions regarding [specific topic or issue].
+
+Firstly, I believe it would be beneficial to [state your first suggestion or idea, providing reasoning or evidence to support it]. Implementing this suggestion could [describe the potential benefits or outcomes].
+
+Secondly, I would like to propose [state your second suggestion or idea, providing reasoning or evidence to support it]. This additional suggestion could further enhance [the organization, efficiency, productivity, etc.].
+
+Moreover, I believe that implementing these suggestions could [benefit the organization, improve efficiency, enhance productivity, etc.], and I would be happy to discuss them further if needed.
+
+Thank you for considering my input.
+
+Best regards,
+[Your Name]` },
+{ name:'6. Personal Experience', kw:['experience','visit','attended','recently had'], body:
+`Subject: Unpleasant Experience with [Service/Experience]
+
+Dear [Recipient's Name],
+
+I hope this message finds you well. Firstly, I would like to introduce myself; my name is [Your Name], and I am writing to express my dissatisfaction with the recent experience I had at [Location/Event].
+
+Firstly, let me provide you with the context of the situation. Secondly, I will delve into the specific incident or interaction that led to my dissatisfaction, highlighting any relevant details such as date, time, and individuals involved.
+
+Firstly, [provide context]. Secondly, [describe the specific incident]. Furthermore, I trust that you will take this feedback seriously and address the issues accordingly to ensure a more positive experience for future customers.
+
+Thank you for your attention to this matter.
+
+Sincerely,
+[Your Name]` },
+{ name:'7. Product Quality', kw:['quality','product','defect','broken','purchased'], body:
+`Subject: Quality Concerns with [Product/Service]
+
+Dear [Recipient's Name],
+
+I trust you are doing well. Firstly, allow me to introduce myself; my name is [Your Name], and I am writing to bring to your attention some concerns I have regarding the quality of the [Product/Service] I recently purchased from [Company Name].
+
+Firstly, I will outline the specific issues I have encountered with the product or service. Secondly, I will elaborate on the impact these issues have had on my experience as a customer.
+
+Firstly, [detail the specific issues]. Secondly, [explain the impact]. Furthermore, I kindly request that you take appropriate action to address these quality issues and prevent similar occurrences in the future.
+
+Thank you for your prompt attention to this matter.
+
+Best regards,
+[Your Name]` },
+{ name:'8. Customer Service Experience', kw:['customer service','representative','staff','rude','unhelpful'], body:
+`Subject: Unsatisfactory Customer Service Experience
+
+Dear [Recipient's Name],
+
+I hope this email finds you well. Firstly, allow me to introduce myself; my name is [Your Name], and I am writing to express my disappointment with the level of customer service I received during my recent interaction with your company.
+
+Firstly, I will provide details of my interaction with customer service representatives. Secondly, I will highlight instances of poor communication, unhelpfulness, or dissatisfaction with the resolution provided.
+
+Firstly, [describe the details]. Secondly, [highlight the instances]. Furthermore, I trust that you will investigate this matter and take appropriate measures to improve the quality of customer service offered by your team.
+
+Thank you for your attention to this concern.
+
+Sincerely,
+[Your Name]` },
+{ name:'9. Billing or Payment Issues', kw:['billing','payment','charge','invoice','account','statement'], body:
+`Subject: Billing Discrepancies and Payment Concerns
+
+Dear [Recipient's Name],
+
+I trust this email finds you well. Firstly, allow me to introduce myself; my name is [Your Name], and I am writing to bring to your attention some discrepancies I have identified in my recent billing statement/account regarding [specific issue].
+
+Firstly, I will detail the billing errors or payment concerns I have encountered. Secondly, I will provide any relevant account numbers or transaction details to support my claim.
+
+Firstly, [detail the discrepancies]. Secondly, [provide supporting information]. Furthermore, I kindly request that you investigate this matter promptly and provide a resolution to rectify the billing discrepancies.
+
+Thank you for your prompt attention to this matter.
+
+Best regards,
+[Your Name]` },
+{ name:'10. Health and Safety', kw:['safety','health','hazard','allerg','ingredient','unsafe','danger','emergency','injur'], body:
+`Subject: Health and Safety Concerns
+
+Dear [Recipient's Name],
+
+I hope this message finds you well. Firstly, allow me to introduce myself; my name is [Your Name], and I am writing to express my serious concerns regarding the health and safety standards observed at [Location/Event/Establishment].
+
+Firstly, I will outline the specific health and safety hazards or violations I have observed. Secondly, I will emphasize the importance of addressing these issues promptly to ensure the well-being of customers and employees.
+
+Firstly, [describe the concerns]. Secondly, [emphasize the importance]. Furthermore, I trust that you will take immediate action to address these concerns and implement measures to uphold higher standards of health and safety in the future.
+
+Thank you for your attention to this urgent matter.
+
+Sincerely,
+[Your Name]` }
+];
+
+const T2_TEMPLATES = [
+{ name:'1. Agree/Disagree', kw:['agree','disagree','statement'], body:
+`In response to the statement/question presented in the survey, I strongly agree/disagree with the assertion for the following reasons.
+
+Firstly, I firmly agree/disagree with the statement because [provide the first reason or argument supporting your position]. For instance, [offer an example or evidence to illustrate your point]. This demonstrates that [explain how your reason supports your stance].
+
+Secondly, another compelling reason why I support/disagree with the statement is [present another reason or argument supporting your position]. This aspect is crucial because [provide further explanation or evidence]. Thus, it is evident that [reiterate your stance and summarize your key arguments].
+
+In conclusion, based on the aforementioned points, it is evident that [restate your stance and summarize your key arguments]. Therefore, I maintain my strong agreement/disagreement with the statement presented in the survey.` },
+{ name:'2. Advantages/Disadvantages', kw:['advantage','benefit','drawback','downside'], body:
+`Regarding the advantages/disadvantages discussed in the survey, I believe that the benefits/downsides outweigh the drawbacks/advantages.
+
+To begin with, one significant advantage/disadvantage is [highlight the first advantage/disadvantage]. This aspect is advantageous/disadvantageous because [explain the impact or reasoning behind your assessment]. For instance, [provide an example or scenario to support your point].
+
+Additionally, another notable advantage/disadvantage is [discuss another advantage/disadvantage]. This further supports my viewpoint since [explain how this aspect strengthens your argument]. An illustrative example of this would be [offer another example or scenario].
+
+Overall, considering the points mentioned above, it is clear that [restate your position and summarize the main points]. Therefore, I maintain that the benefits/downsides outweigh the drawbacks/advantages based on the analysis presented.` },
+{ name:'3. Opinion', kw:['opinion','perspective','viewpoint'], body:
+`In response to the opinion-based question posed in the survey, my perspective is that [state your opinion or viewpoint].
+
+First and foremost, I hold this opinion because [provide the primary reason or rationale for your opinion]. This is because [explain the reasoning behind your viewpoint], which is evident from [offer evidence or examples to support your assertion].
+
+Furthermore, another supporting reason for my opinion is [present another supporting reason for your opinion]. This reinforces my stance since [explain how this reason strengthens your argument]. An example that illustrates this would be [offer another example or scenario].
+
+In conclusion, after considering the aforementioned points, it is apparent that [restate your opinion and summarize your key arguments]. Therefore, I maintain my viewpoint on the matter as presented in the survey.` },
+{ name:'4. Problem/Solution', kw:['problem','solution','solve','resolve'], body:
+`Regarding the problem/solution discussed in the survey, I believe that the proposed solutions are effective/ineffective for addressing the issue.
+
+Firstly, one of the proposed solutions appears effective/ineffective because [discuss the first proposed solution]. This solution seems suitable/unsuitable due to [provide reasoning or evidence to support your assessment]. An example of this would be [offer an example or scenario].
+
+Moreover, another proposed solution also seems suitable/unsuitable due to [evaluate another proposed solution]. This solution also appears effective/ineffective because [explain the rationale behind your evaluation]. An illustrative example of this would be [offer another example or scenario].
+
+In summary, based on the aforementioned analysis, it is evident that [restate your evaluation of the proposed solutions]. Therefore, I maintain my assessment of the proposed solutions as presented in the survey.` },
+{ name:'5. Priority', kw:['priority','prioritize','most important','highest'], body:
+`Regarding the prioritization question in the survey, I believe that [state which option you consider the highest priority].
+
+Firstly, I consider [option A/B] to be the highest priority because [justify why you consider the chosen option the top priority]. This is crucial because [explain the significance or impact of prioritizing this option], as evidenced by [offer evidence or examples to support your assertion].
+
+Additionally, another option, [option X/Y], is of lesser priority due to [discuss another option and explain why it is of lesser priority]. This further reinforces my choice as the most important since [explain how the other options are comparatively less urgent]. An example of this would be [offer another example or scenario].
+
+To conclude, after careful consideration, it is evident that [restate your choice for the highest priority option]. Therefore, I maintain my stance on prioritizing [option A/B] as presented in the survey.` },
+{ name:'6. Comparison', kw:['compare','comparison','versus','difference between'], body:
+`When comparing the options provided in the survey, I am inclined towards [Option A/B] due to several reasons.
+
+Firstly, [discuss the attributes or features of Option A/B that appeal to you]. This option stands out because [explain why these attributes are important or advantageous].
+
+Moreover, another factor influencing my preference is [discuss another aspect of Option A/B]. This further reinforces my choice because [explain how this aspect aligns with your preferences or requirements].
+
+In summary, after carefully evaluating the options, it is evident that [restate your preference for Option A/B]. Therefore, I maintain my preference as indicated in the survey.` },
+{ name:'7. Impact', kw:['impact','effect','affect','implication','consequence'], body:
+`Considering the potential impact of the situation discussed in the survey, I believe that [describe the perceived impact].
+
+Firstly, the situation described in the survey could have significant implications for [discuss the stakeholders or entities affected by the situation]. This is concerning because [explain why these implications are worrisome or noteworthy].
+
+Additionally, if the situation remains unresolved, it could lead to [discuss potential consequences or outcomes]. This underscores the urgency of addressing the issue promptly to avoid [explain the negative repercussions].
+
+In conclusion, based on the potential impact outlined above, it is imperative that [reiterate the importance of addressing the situation]. Therefore, I maintain my perspective as expressed in the survey.` },
+{ name:'8. Preference', kw:['prefer','preference','choose','option','would like'], body:
+`In response to the question about preferences in the survey, I lean towards [Option A/B] for the following reasons.
+
+Firstly, [discuss the features or characteristics of Option A/B that appeal to you]. This option stands out because [explain why these features align with your preferences or needs].
+
+Furthermore, another factor influencing my preference is [discuss another aspect of Option A/B]. This aspect reinforces my choice because [explain how it enhances the desirability of the option].
+
+In summary, after careful consideration, it is evident that [restate your preference for Option A/B]. Therefore, I maintain my preference as indicated in the survey.` },
+{ name:'9. Recommendation', kw:['recommend','suggestion','suggest'], body:
+`Regarding the question about recommendations in the survey, I would suggest [provide your recommendation].
+
+Firstly, I recommend [Option A/B] because [discuss the reasons why you believe this option is the most suitable or beneficial]. This recommendation is based on [explain the rationale behind your choice].
+
+Moreover, another option to consider is [discuss an alternative option], but I believe [reiterate why your recommended option is superior]. This recommendation is made with the intention of [explain the potential benefits or advantages].
+
+In conclusion, after careful consideration, I recommend [restate your recommendation]. Therefore, I maintain my suggestion as expressed in the survey.` },
+{ name:'10. Future Implications', kw:['future','long-term','implications'], body:
+`Considering the potential future implications of the situation described in the survey, it is crucial to [describe the recommended course of action].
+
+Firstly, addressing the current situation promptly is essential to [discuss the immediate benefits or consequences of taking action]. This is important because [explain why addressing the issue now is critical].
+
+Additionally, implementing long-term solutions is necessary to [discuss the desired outcomes or objectives]. This approach will help prevent [explain potential future challenges or problems].
+
+In summary, based on the future implications outlined above, it is imperative that [reiterate the importance of taking action]. Therefore, I maintain my perspective as expressed in the survey.` }
+];
+
+/* ---------- 템플릿 추천/표시 ---------- */
+function getTemplateSet(taskNum) {
+  return taskNum === 1 ? T1_TEMPLATES : T2_TEMPLATES;
+}
+function recommendTemplate(taskNum, text) {
+  const templates = getTemplateSet(taskNum);
+  const lower = text.toLowerCase();
+  let best = 0, bestScore = -1;
+  templates.forEach((t, i) => {
+    let score = 0;
+    t.kw.forEach(k => { if (lower.includes(k)) score++; });
+    if (score > bestScore) { bestScore = score; best = i; }
+  });
+  return best;
+}
+function setupTemplate(taskNum, contextText) {
+  const templates = getTemplateSet(taskNum);
+  const sel = document.getElementById('tpl-select-' + taskNum);
+  sel.innerHTML = '';
+  templates.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = t.name;
+    sel.appendChild(opt);
+  });
+  const reco = recommendTemplate(taskNum, contextText);
+  sel.value = reco;
+  document.getElementById('tpl-reco-' + taskNum).textContent = '⭐ 추천 템플릿: ' + templates[reco].name;
+  document.getElementById('tpl-pane-' + taskNum).classList.add('hidden');
+  document.getElementById('tpl-btn-' + taskNum).textContent = '📄 템플릿 보기';
+  renderTemplate(taskNum);
+}
+function toggleTemplate(taskNum) {
+  const pane = document.getElementById('tpl-pane-' + taskNum);
+  const btn = document.getElementById('tpl-btn-' + taskNum);
+  const isHidden = pane.classList.toggle('hidden');
+  btn.textContent = isHidden ? '📄 템플릿 보기' : '✖ 템플릿 닫기';
+}
+function renderTemplate(taskNum) {
+  const templates = getTemplateSet(taskNum);
+  const idx = parseInt(document.getElementById('tpl-select-' + taskNum).value) || 0;
+  const body = templates[idx].body;
+  let html = escapeHtml(body);
+  html = html.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+  document.getElementById('tpl-content-' + taskNum).innerHTML = html;
+}
 
 /* ---------- 데이터 ---------- */
 function loadSets() {
@@ -1263,6 +1588,9 @@ function startTest(id) {
   document.getElementById('qw2').value = '';
   updateCount('essay1','count1');
   updateCount('essay2','count2');
+
+  setupTemplate(1, s.task1.situation + ' ' + s.task1.bullets);
+  setupTemplate(2, s.task2.situation + ' ' + s.task2.question + ' ' + s.task2.optionA + ' ' + s.task2.optionB);
 
   let warn = '';
   const tops = topErrorCategories(3);
