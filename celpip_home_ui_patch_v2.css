@@ -1,0 +1,358 @@
+/* CELPIP Home UI Patch v2
+   Scope: #view-home only
+   Apply after celpip_ui_tokens_patch_v1.css.
+   No HTML, JavaScript, IDs, names, data attributes, or event handlers changed.
+*/
+
+#view-home {
+  min-width: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--color-background);
+}
+
+#view-home .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  min-width: 0;
+  padding: 16px clamp(16px, 3vw, 32px);
+  background: rgba(255, 255, 255, .88);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-small);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+}
+
+#view-home .header h1 {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+
+#view-home .header > div {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid #cfe2ff;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#view-home .home-wrap {
+  width: min(calc(100% - 32px), var(--content-max-width));
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--spacing-xl) 0 48px;
+}
+
+#view-home .home-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  margin: 0 0 var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-small);
+}
+
+#view-home .home-toolbar .btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+/* Primary learning actions: first two buttons in the existing HTML order. */
+#view-home .home-toolbar .btn-vocab,
+#view-home .home-toolbar .btn-errors {
+  font-weight: 750;
+  box-shadow: var(--shadow-small);
+}
+
+#view-home .home-toolbar .btn-vocab {
+  color: #9a4600;
+  background: #fff1e8;
+  border-color: #ffd8b8;
+}
+
+#view-home .home-toolbar .btn-errors {
+  color: #5030a7;
+  background: #f1edff;
+  border-color: #d9ceff;
+}
+
+#view-home .home-toolbar .btn-export,
+#view-home .home-toolbar .btn-import {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border-light);
+  box-shadow: none;
+}
+
+#view-home .home-toolbar .btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+#view-home .home-toolbar .btn:active:not(:disabled) {
+  transform: translateY(0) scale(.98);
+}
+
+#view-home .home-toolbar .btn:focus-visible {
+  outline: 3px solid rgba(0, 122, 255, .36);
+  outline-offset: 3px;
+}
+
+#view-home .home-toolbar > span {
+  min-width: 0;
+  margin-left: auto;
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+#view-home #setGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  min-width: 0;
+}
+
+#view-home .set-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 156px;
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-small);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+#view-home .set-card:hover {
+  transform: translateY(-3px);
+  border-color: #b8d5ff;
+  box-shadow: var(--shadow-medium);
+}
+
+#view-home .set-card:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, .16), var(--shadow-medium);
+}
+
+#view-home .set-card h3 {
+  min-width: 0;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--color-text-primary);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#view-home .set-status {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#view-home .status-ready {
+  color: #18723a;
+  background: #e8f8ed;
+  border-color: #b9e7c8;
+}
+
+#view-home .status-empty {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border-light);
+}
+
+#view-home .set-card .row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+  min-width: 0;
+  margin-top: auto;
+  padding-top: var(--spacing-lg);
+}
+
+#view-home .set-card .row .btn {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#view-home .btn-start {
+  color: #fff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+#view-home .btn-start:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+#view-home .btn-edit {
+  color: var(--color-text-primary);
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
+#view-home .btn-edit:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-color: #b8d5ff;
+  box-shadow: var(--shadow-small);
+}
+
+#view-home .btn-start:focus-visible,
+#view-home .btn-edit:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid rgba(0, 122, 255, .38);
+  outline-offset: 3px;
+}
+
+#view-home .btn-start:disabled,
+#view-home .btn-edit:disabled,
+#view-home .home-toolbar .btn:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 1023px) {
+  #view-home .home-wrap {
+    width: min(calc(100% - 24px), var(--content-max-width));
+    padding-top: var(--spacing-lg);
+  }
+
+  #view-home .home-toolbar {
+    flex-wrap: wrap;
+  }
+
+  #view-home .home-toolbar > span {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  #view-home #setGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  #view-home .header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: 14px 12px;
+  }
+
+  #view-home .header h1 {
+    width: 100%;
+    font-size: 21px;
+  }
+
+  #view-home .header > div {
+    white-space: normal;
+  }
+
+  #view-home .home-wrap {
+    width: min(calc(100% - 24px), var(--content-max-width));
+    padding-block: var(--spacing-md) 32px;
+  }
+
+  #view-home .home-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+
+  #view-home .home-toolbar .btn {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+    white-space: normal;
+  }
+
+  #view-home .home-toolbar > span {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  #view-home #setGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  #view-home .set-card {
+    min-height: 148px;
+    padding: var(--spacing-md);
+  }
+
+  #view-home .set-card .row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  #view-home .home-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  #view-home .home-toolbar > span {
+    grid-column: auto;
+  }
+
+  #view-home .set-card .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view-home .set-card,
+  #view-home .home-toolbar .btn {
+    transition: none;
+  }
+
+  #view-home .set-card:hover,
+  #view-home .home-toolbar .btn:hover:not(:disabled) {
+    transform: none;
+  }
+}
