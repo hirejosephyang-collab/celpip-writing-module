@@ -94,7 +94,77 @@ window.submitTest = function () {
   originalSubmitTest();
   if (activeSetId) addAttempt(activeSetId);
 };
+/* ---------- 풀이 횟수를 포함한 백업·복원 ---------- */
+function readStoredData(key, fallback) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
 
+window.exportData = function () {
+  const backup = {
+    sets: readStoredData('celpip_sets_v6', {}),
+    vocab: readStoredData('celpip_vocab_v1', []),
+    errors: readStoredData('celpip_errors_v1', []),
+    attempts: loadAttempts(),
+    exportedAt: new Date().toISOString()
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(backup, null, 2)],
+    { type: 'application/json' }
+  );
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'celpip-backup.json';
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
+window.importData = function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    try {
+      const data = JSON.parse(e.target.result);
+
+      if (!confirm('현재 데이터가 백업 파일의 데이터로 교체됩니다. 계속할까요?')) {
+        event.target.value = '';
+        return;
+      }
+
+      if (data.sets) {
+        localStorage.setItem('celpip_sets_v6', JSON.stringify(data.sets));
+      }
+
+      if (data.vocab) {
+        localStorage.setItem('celpip_vocab_v1', JSON.stringify(data.vocab));
+      }
+
+      if (data.errors) {
+        localStorage.setItem('celpip_errors_v1', JSON.stringify(data.errors));
+      }
+
+      if (data.attempts) {
+        saveAttempts(data.attempts);
+      }
+
+      alert('복원이 완료되었습니다. 페이지를 새로 불러옵니다.');
+      window.location.reload();
+    } catch (err) {
+      alert('백업 파일을 읽을 수 없습니다. 올바른 JSON 백업 파일인지 확인하세요.');
+    }
+  };
+
+  reader.readAsText(file);
+  event.target.value = '';
+};
   function makeErrorAnalysisPrompt() {
     let allErrors = [];
 try {
