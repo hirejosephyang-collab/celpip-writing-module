@@ -1,7 +1,49 @@
 /* CELPIP progress + error-analysis patch v1 */
 (function () {
   const ATTEMPTS_KEY = 'celpip_set_attempts_v1';
-  const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 5;
+
+const style = document.createElement('style');
+style.textContent = `
+  .set-status.status-attempts {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: max-content;
+    padding: 6px 9px;
+    margin-bottom: 12px;
+    background: #f6f8fc;
+    color: #596579;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .attempt-label {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .set-attempt-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .attempt-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d8dee9;
+    display: block;
+  }
+
+  .attempt-icon.is-done {
+    background: #1677ff;
+  }
+`;
+document.head.appendChild(style);
 
   function loadAttempts() {
     try { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)) || {}; }
