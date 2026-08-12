@@ -81,12 +81,19 @@ document.head.appendChild(style);
     });
   };
 
-  const originalSubmitTest = window.submitTest;
-  window.submitTest = function () {
-    const completedSetId = window.currentSetId;
-    originalSubmitTest();
-    if (completedSetId) addAttempt(completedSetId);
-  };
+let activeSetId = null;
+
+const originalStartTest = window.startTest;
+window.startTest = function (id) {
+  activeSetId = id;
+  return originalStartTest(id);
+};
+
+const originalSubmitTest = window.submitTest;
+window.submitTest = function () {
+  originalSubmitTest();
+  if (activeSetId) addAttempt(activeSetId);
+};
 
   function makeErrorAnalysisPrompt() {
     let allErrors = [];
