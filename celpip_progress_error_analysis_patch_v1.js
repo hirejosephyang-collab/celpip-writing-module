@@ -63,7 +63,7 @@ document.head.appendChild(style);
   function attemptIcons(count) {
     return '<span class="set-attempt-icons" aria-label="풀이 횟수 ' + count + ' / ' + MAX_ATTEMPTS + '">' +
       Array.from({ length: MAX_ATTEMPTS }, (_, i) =>
-        '<span class="attempt-icon ' + (i < count ? 'is-done' : '') + '">✦</span>'
+        '<span class="attempt-icon ' + (i < count ? 'is-done' : '') + '"></span>'
       ).join('') + '</span>';
   }
 
