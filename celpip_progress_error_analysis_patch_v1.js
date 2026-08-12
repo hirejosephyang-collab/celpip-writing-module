@@ -47,7 +47,10 @@
   };
 
   function makeErrorAnalysisPrompt() {
-    const allErrors = Array.isArray(window.errors) ? window.errors : [];
+    let allErrors = [];
+try {
+  allErrors = JSON.parse(localStorage.getItem('celpip_errors_v1')) || [];
+} catch (e) {}
     if (allErrors.length === 0) return '';
     const grouped = allErrors.reduce((acc, item) => {
       const category = item.category || '기타';
